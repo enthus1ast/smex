@@ -3,12 +3,47 @@
 
 
 class NextState(Exception):
+	""" 
+		We raise this to break out of the current state. DO NOT CATCH THIS! 
+	"""
 	pass
 
 class SM(object):
+	"""
+		smex Simple State machine
+		usage:
+			
+			from smex import SM
+			
+			def go1():
+				SM.go(go2)
 
+			def go2():
+				SM.go(go1)
+
+			sm = SM()
+			sm.add(go1)
+			sm.add(go2)
+			sm.start("go1")
+		More examples:
+			have a look at smtest.py
+
+		More Info:
+			all states are called from the state machine object.
+			So in every state "this" points to the state machine object.
+			So you can store and retreive data from state to state by using this.mydata = 123
+	"""
 	def go(stateName,*args, **kwargs):
-		raise NextState (SM._fn(stateName),args,kwargs)
+		""" 
+			Use SM.go(statename) to switch between states
+			You have to call the class methode go()  NOT the objects
+
+			You can provide arguments with go("statename",some,arguments="foo") # TODO
+
+			go() is breaking out of the current executed state by throwing an NextState
+			exception, this gets catched by the state machine, then it starts the next state.
+		"""
+		raise NextState (SM._fn(stateName),*args,**kwargs)
 
 	def __init__(this):
 		this.states = {}
@@ -30,12 +65,21 @@ class SM(object):
 
 	# def preRun(this,oldstate,newstate):
 	def preRun(this):	
-		""" Overwrite me """
+		""" 
+			Overwrite me 
+			This gets called before the new state is executed.
+			if you want to do something before a state is run, overwrite this in the state 
+			machine level.
+		"""
 		pass
 
 	# def postRun(this,oldstate,newstate):
 	def postRun(this):
-		""" Overwrite me """
+		""" 
+			Overwrite me 
+			This gets called after a state was executed.
+			if you want to do something after a state has run.		
+		"""
 		pass
 
 	def add(this,stateFunc):
@@ -51,10 +95,15 @@ class SM(object):
 			sm.add(state1)
 			sm.go("state1")  # or  sm.go(state1)
 		"""
+		stateFunc.__globals__.update(vars())
 		this.states[stateFunc.__name__] = stateFunc
 
 	def start(this,stateName):
-		""" starts the state machine main loop """
+		""" 
+			starts the state machine main loop,
+			begin with the state "stateName"
+		"""
+		stateName = SM._fn ( stateName )
 		print("Starting at:", stateName)
 		this.activeState = stateName
 		while True:
