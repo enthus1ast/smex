@@ -3,7 +3,8 @@ import time
 import sys
 import random
 
-def drinking():
+def drinking(what="beer"):
+	print ("DRINKING", what)
 	print(this.pissLevel)
 	this.pissLevel +=  random.randint(1,10)
 	time.sleep(0.2)
@@ -24,7 +25,7 @@ def pissing():
 
 def sleeping():
 	time.sleep(5.2)
-	SM.go(drinking)
+	SM.go(drinking,what="SCHNAPS")
 
 
 pissbot = SM()
@@ -32,4 +33,4 @@ pissbot.pissLevel = 10
 pissbot.add(drinking)
 pissbot.add(pissing)
 pissbot.add(sleeping)
-pissbot.start(drinking)
+pissbot.start(drinking,what="beer")

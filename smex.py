@@ -1,6 +1,9 @@
 """ 
 	A simple state machine
 	Please have a look at the "./examples" directory.
+
+	Import like so:
+		from smex import SM
 """
 
 class NextState(Exception):
@@ -10,6 +13,12 @@ class NextState(Exception):
 	pass
 
 class NewStateInfo(object):
+	""" 
+		We use this to tell the next state how to run
+		we can spezify arguments and positional arguments
+
+	"""
+
 	def __init__(this, stateName,args=[],kwargs={}):
 			this.nextState = SM._fn(stateName)
 			this.args = args 
@@ -34,12 +43,15 @@ class SM(object):
 			sm.add(go2)
 			sm.start("go1")
 		More examples:
-			have a look at smtest.py
+			have a look at the "./examples" dir
 
 		More Info:
 			all states are called from the state machine object.
 			So in every state "this" points to the state machine object.
 			So you can store and retreive data from state to state by using this.mydata = 123
+		More Info:
+			one yould also append args and kwargs to the state by:
+			SM.go("state",some,args,some="more", args=":)")
 	"""
 	def go(stateName,*args, **kwargs):
 		""" 
@@ -107,12 +119,12 @@ class SM(object):
 		stateFunc.__globals__.update(vars())
 		this.states[stateFunc.__name__] = stateFunc
 
-	def start(this,stateName):
+	def start(this,stateName,*args, **kwargs):
 		""" 
 			starts the state machine main loop,
 			begin with the state "stateName"
 		"""
-		this.newStateInfo = NewStateInfo(SM._fn ( stateName ),[],{})
+		this.newStateInfo = NewStateInfo(SM._fn ( stateName ),args, kwargs)
 		print("Starting at:", this.newStateInfo.nextState)
 		this.activeState = this.newStateInfo.nextState
 		
@@ -127,8 +139,6 @@ class SM(object):
 
 				this.postRun()			
 				print ("Going to state:",this.newStateInfo.nextState)
-				print(this.newStateInfo.nextState)
-				# quit()
 				this.activeState = this.newStateInfo.nextState
 				continue
 			except Exception as exp:
