@@ -1,3 +1,8 @@
+""" 
+	This is an example of a full finite state machine utilizing smex.
+	It will drink and piss and sleep for you.
+"""
+
 from smex import SM
 import time 
 import sys
@@ -20,7 +25,6 @@ def pissing():
 		sys.stdout.write("\n")
 		time.sleep(0.5)
 		this.pissLevel = 0 #
-
 	SM.go(sleeping)
 
 def sleeping():

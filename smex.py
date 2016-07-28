@@ -1,6 +1,10 @@
 """ 
 	A simple state machine
-	Please have a look at the "./examples" directory.
+	For complete examples please have a look at the:
+			pissbot.py
+		or
+			smtests.py
+		file.
 
 	Import like so:
 		from smex import SM
@@ -42,8 +46,11 @@ class SM(object):
 			sm.add(go1)
 			sm.add(go2)
 			sm.start("go1")
-		More examples:
-			have a look at the "./examples" dir
+		For more examples have a look at:
+				pissbot.py
+			or
+				smtests.py
+			file.
 
 		More Info:
 			all states are called from the state machine object.
