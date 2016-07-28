@@ -17,6 +17,7 @@ def noRecursionLimit():
 		SM.go(go1)
 
 	sm = SM()
+	sm.debug(True)
 	sm.add(go1)
 	sm.add(go2)
 	sm.start("go1")
@@ -41,14 +42,14 @@ def simpleMachine():
 		time.sleep(1)
 		if random.randint(0,1):
 			print("\tFound targets!")
-			SM.go(ddos)
+			SM.go(flying)
 		else:
 			print ("\tNothing :/")
 			SM.go(idle)
 
-	def ddos():
+	def flying():
 		# hier was anders
-		print("\tHello from state ddos :) ")
+		print("\tHello from state flying :) ")
 		time.sleep(1)
 		# raise KeyError ("HALLO")
 		SM.go(idle)
@@ -59,7 +60,8 @@ def simpleMachine():
 		SM.go(scan)
 
 	sm = SM() 
-	sm.add(ddos) # we add the functions
+	sm.debug(True)
+	sm.add(flying) # we add the functions
 	sm.add(scan) # to our state
 	sm.add(idle) # machine.
 	sm.errorState("scan") # when a function is not catching all Exceptions we go to this state

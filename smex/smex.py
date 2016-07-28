@@ -149,7 +149,7 @@ class SM(object):
 			begin with the state "stateName"
 		"""
 		this.newStateInfo = NewStateInfo(SM._fn ( stateName ),args, kwargs)
-		this.log.info("Starting at: %s" % this.newStateInfo.nextState)
+		this.log.info("Starting at: [%s]" % this.newStateInfo.nextState)
 		this.activeState = this.newStateInfo.nextState
 		
 		while True:
@@ -161,7 +161,7 @@ class SM(object):
 			except NextState as exp:
 				this.newStateInfo = exp.args[0]
 				this.postRun()			
-				this.log.info ("Going to state: %s" % this.newStateInfo.nextState)
+				this.log.info ("Going to: [%s]" % this.newStateInfo.nextState)
 				this.activeState = this.newStateInfo.nextState
 				continue
 			except Exception as exp:
