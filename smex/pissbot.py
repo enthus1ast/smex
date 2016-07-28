@@ -19,6 +19,7 @@ def drinking(what="beer"):
 		SM.go(drinking)
 
 def pissing():
+	# raise ValueError("LOOL")
 	if this.pissLevel > 10:
 		sys.stdout.write("PISSING ")
 		sys.stdout.flush()
@@ -31,10 +32,17 @@ def sleeping():
 	time.sleep(5.2)
 	SM.go(drinking,what="SCHNAPS")
 
+def errorState():
+	print("the pissbot is broken, we go sleeping to recover from the shock : ) ")
+	time.sleep(1)
+	SM.go(sleeping)
 
 pissbot = SM()
+# pissbot.debug(True)
 pissbot.pissLevel = 10
 pissbot.add(drinking)
 pissbot.add(pissing)
 pissbot.add(sleeping)
+pissbot.add(errorState)
+pissbot.errorState("errorState")
 pissbot.start(drinking,what="beer")

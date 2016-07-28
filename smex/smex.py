@@ -9,6 +9,8 @@
 	Import like so:
 		from smex import SM
 """
+import logging
+import sys
 
 class NextState(Exception):
 	""" 
@@ -57,8 +59,8 @@ class SM(object):
 			So in every state "this" points to the state machine object.
 			So you can store and retreive data from state to state by using this.mydata = 123
 		More Info:
-			one yould also append args and kwargs to the state by:
-			SM.go("state",some,args,some="more", args=":)")
+			one could also append args and kwargs to the state by:
+			SM.go("state",args,some="more")
 	"""
 	def go(stateName,*args, **kwargs):
 		""" 
@@ -74,6 +76,8 @@ class SM(object):
 		raise NextState (newStateInfo)
 
 	def __init__(this):
+		this.log = logging.getLogger("smex")
+		this.log.addHandler(logging.StreamHandler(sys.stdout))
 		this.states = {}
 		this.activeState = None
 		this._errorState = None
@@ -82,11 +86,15 @@ class SM(object):
 	def _fn(stateName):
 		""" Returns the callable name OR if stateName is a string just return it """
 		nextState = None
-		if hasattr(stateName, '__call__'): # check if this is a callable 
+		if hasattr(stateName, '__call__'): # check if this is a callable, we test if this obj CAN quack :)
 			nextState = stateName.__name__
 		else:
 			nextState = stateName	
 		return nextState
+
+	def debug(this,debugEnabled):
+		if debugEnabled: 
+			this.log.level = logging.INFO
 
 	def errorState(this,stateName):
 		this._errorState = SM._fn(stateName)
@@ -97,7 +105,15 @@ class SM(object):
 			Overwrite me 
 			This gets called before the new state is executed.
 			if you want to do something before a state is run, overwrite this in the state 
-			machine level.
+			machine level. eg:
+
+			def myPreRun():
+				print("i'm called before the state is executed")
+
+			sm = SM()
+			sm.preRun = myPreRun
+			....
+
 		"""
 		pass
 
@@ -106,7 +122,8 @@ class SM(object):
 		""" 
 			Overwrite me 
 			This gets called after a state was executed.
-			if you want to do something after a state has run.		
+			if you want to do something after a state has run.	
+			same usage as preRun	
 		"""
 		pass
 
@@ -121,9 +138,9 @@ class SM(object):
 			
 			sm = SM()
 			sm.add(state1)
-			sm.go("state1")  # or  sm.go(state1)
+			sm.go("state1")  # or  sm.go(state1)  SM.go ist smart enough to get the name out of a callable
 		"""
-		stateFunc.__globals__.update(vars())
+		stateFunc.__globals__.update({"this":this}) # we make this available inside the states, le magic... 
 		this.states[stateFunc.__name__] = stateFunc
 
 	def start(this,stateName,*args, **kwargs):
@@ -132,20 +149,19 @@ class SM(object):
 			begin with the state "stateName"
 		"""
 		this.newStateInfo = NewStateInfo(SM._fn ( stateName ),args, kwargs)
-		print("Starting at:", this.newStateInfo.nextState)
+		this.log.info("Starting at: %s" % this.newStateInfo.nextState)
 		this.activeState = this.newStateInfo.nextState
 		
 		while True:
 			try:			
 				this.preRun()
 				this.states[this.activeState](*this.newStateInfo.args, **this.newStateInfo.kwargs )
-				print("State [%s] did not go to another state, so exitting" % this.activeState)
+				this.log.info("State [%s] did not go to another state, so exitting" % this.activeState)
 				break				
 			except NextState as exp:
 				this.newStateInfo = exp.args[0]
-
 				this.postRun()			
-				print ("Going to state:",this.newStateInfo.nextState)
+				this.log.info ("Going to state: %s" % this.newStateInfo.nextState)
 				this.activeState = this.newStateInfo.nextState
 				continue
 			except Exception as exp:
@@ -154,13 +170,15 @@ class SM(object):
 				# has an default error state
 				# we switch to it
 				if this._errorState:
-					print ("")
-					print ("==================")
-					print ("| ERROR IN STATE |")
-					print ("==================")
-					print (exp)
-					print ("Going to default Error State:",this._errorState)
+					this.log.error ("")
+					this.log.error ("==================")
+					this.log.error ("| ERROR IN STATE | -> %s" % this.newStateInfo.nextState )
+					this.log.error ("==================")
+					this.log.error (exp)
+					this.log.error ("")
+					this.log.error ("Going to default Error State: %s" % this._errorState)
 					this.activeState = this._errorState
+					this.newStateInfo = NewStateInfo(SM._fn ( this.errorState ),[], {}) # atm the error state is not accepting parameters
 					continue
 				else:
 					raise exp					
