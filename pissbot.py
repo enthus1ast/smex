@@ -5,9 +5,6 @@ import random
 
 def drinking():
 	print(this.pissLevel)
-	# exit()
-
-	# global pissLevel
 	this.pissLevel +=  random.randint(1,10)
 	time.sleep(0.2)
 	if this.pissLevel >= 10:

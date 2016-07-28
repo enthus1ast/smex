@@ -1,12 +1,20 @@
-# import logging
-
-
+""" 
+	A simple state machine
+	Please have a look at the "./examples" directory.
+"""
 
 class NextState(Exception):
 	""" 
 		We raise this to break out of the current state. DO NOT CATCH THIS! 
 	"""
 	pass
+
+class NewStateInfo(object):
+	def __init__(this, stateName,args=[],kwargs={}):
+			this.nextState = SM._fn(stateName)
+			this.args = args 
+			this.kwargs = kwargs 
+		
 
 class SM(object):
 	"""
@@ -43,7 +51,8 @@ class SM(object):
 			go() is breaking out of the current executed state by throwing an NextState
 			exception, this gets catched by the state machine, then it starts the next state.
 		"""
-		raise NextState (SM._fn(stateName),*args,**kwargs)
+		newStateInfo = NewStateInfo(stateName,args,kwargs)
+		raise NextState (newStateInfo)
 
 	def __init__(this):
 		this.states = {}
@@ -103,19 +112,24 @@ class SM(object):
 			starts the state machine main loop,
 			begin with the state "stateName"
 		"""
-		stateName = SM._fn ( stateName )
-		print("Starting at:", stateName)
-		this.activeState = stateName
+		this.newStateInfo = NewStateInfo(SM._fn ( stateName ),[],{})
+		print("Starting at:", this.newStateInfo.nextState)
+		this.activeState = this.newStateInfo.nextState
+		
 		while True:
-			try:
+			try:			
 				this.preRun()
-				this.states[this.activeState]()
+				this.states[this.activeState](*this.newStateInfo.args, **this.newStateInfo.kwargs )
 				print("State [%s] did not go to another state, so exitting" % this.activeState)
 				break				
 			except NextState as exp:
+				this.newStateInfo = exp.args[0]
+
 				this.postRun()			
-				print ("Going to state:",exp.args[0])
-				this.activeState = exp.args[0]
+				print ("Going to state:",this.newStateInfo.nextState)
+				print(this.newStateInfo.nextState)
+				# quit()
+				this.activeState = this.newStateInfo.nextState
 				continue
 			except Exception as exp:
 				# A state has trown an error withouth 
