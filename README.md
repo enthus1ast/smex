@@ -6,6 +6,7 @@ Smex is a simple state machine.
 
 Usage:	
 ```python
+
 from smex import SM
 
 def go1():
@@ -28,6 +29,8 @@ OR
 	somewhere
 	
 """
+
+from smex import SM
 
 def  scan ():
 	# hier mach ich was
@@ -68,6 +71,7 @@ OR
 """
 
 from smex import SM
+
 import time 
 import sys
 import random
