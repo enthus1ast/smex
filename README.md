@@ -3,8 +3,9 @@ smex
 Smex is a simple state machine.
 
 
-Usage:	
 
+Usage:	
+```python
 	from smex import SM
 	
 	def go1():
@@ -15,10 +16,10 @@ Usage:
 	sm.add(go1)
 	sm.add(go2)
 	sm.start("go1")
-
+```
 
 OR
-
+```python
 	""" 
 		This is an example of a simple machine 
 		A state is a normal function.
@@ -57,10 +58,10 @@ OR
 	sm.add(idle) # machine.
 	sm.errorState("scan") # when a function is not catching all Exceptions we go to this state
 	sm.start("scan") # we start the maschine at the state scan
-
+```
 
 OR
-
+```python
 	""" 
 		This is an example of a full finite state machine utilizing smex.
 		It will drink and piss and sleep for you.
@@ -82,7 +83,6 @@ OR
 			SM.go(drinking)
 
 	def pissing():
-		# raise ValueError("LOOL")
 		if this.pissLevel > 10:
 			sys.stdout.write("PISSING ")
 			sys.stdout.flush()
@@ -110,6 +110,6 @@ OR
 	pissbot.add(errorState)
 	pissbot.errorState("errorState")
 	pissbot.start(drinking,what="beer")
-
+```
 Get more help/examples by looking at the source code of
 smex.py , pissbot.py , smtests.py
