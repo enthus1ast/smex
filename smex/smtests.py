@@ -23,6 +23,15 @@ def noRecursionLimit():
 	sm.start("go1")
 
 
+def RecursionLimit():
+	def myfunc1():
+		myfunc2()
+
+	def myfunc2():
+		myfunc1()
+
+	myfunc1()
+
 def simpleMachine():
 	""" 
 
@@ -68,5 +77,5 @@ def simpleMachine():
 	sm.start("scan") # we start the maschine at the state scan
 
 
-# noRecursionLimit()
-simpleMachine()
+noRecursionLimit()
+# simpleMachine()

@@ -33,7 +33,7 @@ class NewStateInfo(object):
 
 class SM(object):
 	"""
-		smex Simple State machine
+		smex  - Simple state Machine EXtendet -
 		usage:
 			
 			from smex import SM
@@ -138,7 +138,9 @@ class SM(object):
 			
 			sm = SM()
 			sm.add(state1)
-			sm.go("state1")  # or  sm.go(state1)  SM.go ist smart enough to get the name out of a callable
+
+			#sm.go(state1) # SM.go ist smart enough to get the name out of a callable
+			sm.go("state1")    
 		"""
 		stateFunc.__globals__.update({"this":this}) # we make this available inside the states, le magic... 
 		this.states[stateFunc.__name__] = stateFunc
@@ -156,7 +158,7 @@ class SM(object):
 			try:			
 				this.preRun()
 				this.states[this.activeState](*this.newStateInfo.args, **this.newStateInfo.kwargs )
-				this.log.info("State [%s] did not go to another state, so exitting" % this.activeState)
+				this.log.error("State [%s] did not go to another state, so exitting" % this.activeState)
 				break				
 			except NextState as exp:
 				this.newStateInfo = exp.args[0]

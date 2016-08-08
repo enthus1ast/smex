@@ -7,5 +7,6 @@ setup(name='smex',
       author='David Krause',
       author_email='david@klangfragment.de',
       # license='MIT',
-      packages=['smex'],
-      zip_safe=False)
+      packages=['smex']
+      # zip_safe=False
+      )

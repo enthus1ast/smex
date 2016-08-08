@@ -29,6 +29,7 @@ def pissing():
 	SM.go(sleeping)
 
 def sleeping():
+	print("zzZZZzzzZZZzzzZZZ")
 	time.sleep(5.2)
 	SM.go(drinking,what="SCHNAPS")
 
@@ -38,7 +39,7 @@ def errorState():
 	SM.go(sleeping)
 
 pissbot = SM()
-# pissbot.debug(True)
+pissbot.debug(True)
 pissbot.pissLevel = 10
 pissbot.add(drinking)
 pissbot.add(pissing)
