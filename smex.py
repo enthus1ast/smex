@@ -82,6 +82,7 @@ class SM(object):
 		this.activeState = None
 		this.oldState = None # this is the state before the current active state
 		this._errorState = None # a default state where the prog can recover from an error etc.
+		this.transitionFunc = lambda src,dst: None # pre run dummy function
 		# this.debug = False
 
 	def _fn(stateName):
@@ -102,34 +103,38 @@ class SM(object):
 		""" specify the state that is swiched to if an exception is not catched by a state """
 		this._errorState = SM._fn(stateName)
 
-	def preRun(this,src,dst):	
-		""" 
-			Overwrite me 
-			This gets called before the new state is executed.
-			if you want to do something before a state is run, overwrite this in the state 
-			machine level. eg:
+	def _transition(this,src,dst):
+		this.transitionFunc(src,dst)
 
-			def myPreRun():
+	def transition(this,func):	
+
+		""" 
+			This gets called before the new state is executed.
+			if you want to do something before a state is running ( while "transisting")
+
+
+			def myTransitionFun():
 				print("i'm called before the state is executed")
 
 			sm = SM()
-			sm.preRun = myPreRun
+			sm.transition(myTransitionFun)
 			....
 
 		"""
-		print this
-		print("Going to transist from %s -> %s " % (src,dst))
-		pass
-
+		if hasattr(func, '__call__'): # check if this is a callable, we test if this obj CAN quack :)
+			this.transitionFunc = func
+		else:
+			raise ValueError ("func should be a callable!")
+		
 	# def postRun(this,oldstate,newstate):
-	def postRun(this,src=None,dst=None):
-		""" 
-			Overwrite me 
-			This gets called after a state was executed.
-			if you want to do something after a state has run.	
-			same usage as preRun	
-		"""
-		pass
+	# def postRun(this,src=None,dst=None):
+	# 	""" 
+	# 		Overwrite me 
+	# 		This gets called after a state was executed.
+	# 		if you want to do something after a state has run.	
+	# 		same usage as preRun	
+	# 	"""
+	# 	pass
 
 	def add(this,stateFunc):
 		""" 
@@ -160,13 +165,13 @@ class SM(object):
 		
 		while True:
 			try:			
-				this.preRun(src=this.oldState,dst=this.activeState) # 
+				this.transitionFunc(this.oldState,this.activeState) # 
 				this.states[this.activeState](*this.newStateInfo.args, **this.newStateInfo.kwargs )
 				this.log.error("State [%s] did not go to another state, so exitting" % this.activeState)
 				break				
 			except NextState as exp:
 				this.newStateInfo = exp.args[0]
-				this.postRun() # todo..			
+				# this.postRun() # todo..			
 				this.log.info ("Going to: [%s]" % this.newStateInfo.nextState)
 				this.oldState = this.activeState
 				this.activeState = this.newStateInfo.nextState
@@ -199,6 +204,6 @@ if __name__ == '__main__':
 
 	def trans(a,b):
 		print(a,"->",b)
-	sm.preRun = trans
+	sm.transition(trans)
 	sm.add(u)	
 	sm.start(u)

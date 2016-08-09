@@ -43,6 +43,10 @@ def errorState():
 
 pissbot = SM()
 pissbot.debug(True)
+def trans(oldState,newState):
+	""" Here we could do something on state change. """ 
+	print(a,"->",b)
+pissbot.transition(trans)
 pissbot.pissLevel = 10
 pissbot.add(drinking)
 pissbot.add(pissing)
