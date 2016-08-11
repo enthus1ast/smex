@@ -11,7 +11,10 @@ import random
 def drinking(what="beer"):
 	print ("DRINKING", what)
 	print(this.pissLevel)
-	this.pissLevel +=  random.randint(1,10)
+	if what == "beer":
+		this.pissLevel +=  random.randint(4,10)
+	if what == "SCHNAPS":
+		this.pissLevel +=  random.randint(2,4)
 	time.sleep(0.2)
 	if this.pissLevel >= 10:
 		SM.go(pissing)
@@ -19,7 +22,6 @@ def drinking(what="beer"):
 		SM.go(drinking)
 
 def pissing():
-	# raise ValueError("LOOL")
 	if this.pissLevel > 10:
 		sys.stdout.write("PISSING ")
 		sys.stdout.flush()
@@ -39,18 +41,16 @@ def errorState():
 	time.sleep(1)
 	SM.go(sleeping)
 
-#def transition():
-
 pissbot = SM()
 pissbot.debug(True)
 def trans(oldState,newState):
 	""" Here we could do something on state change. """ 
-	print(a,"->",b)
+	print(oldState,"->",newState)
 pissbot.transition(trans)
 pissbot.pissLevel = 10
 pissbot.add(drinking)
 pissbot.add(pissing)
 pissbot.add(sleeping)
 pissbot.add(errorState)
-pissbot.errorState("errorState")
+pissbot.errorState(errorState)
 pissbot.start(drinking,what="beer")

@@ -34,7 +34,10 @@ class NewStateInfo(object):
 class SM(object):
 	"""
 		smex  - Simple state Machine EXtendet -
-		usage:
+		[ https://github.com/enthus1ast/smex ]
+		
+		usage
+		=====
 			
 			from smex import SM
 			
@@ -48,29 +51,50 @@ class SM(object):
 			sm.add(go1)
 			sm.add(go2)
 			sm.start("go1")
+
 		For more examples have a look at:
 				pissbot.py
 			or
 				smtests.py
 			file.
 
-		More Info:
-			all states are called from the state machine object.
-			So in every state "this" points to the state machine object.
-			So you can store and retreive data from state to state by using this.mydata = 123
-		More Info:
+		Arguments to states
+		===================
+
 			one could also append args and kwargs to the state by:
 			SM.go("state",args,some="more")
+
+		Transitions
+		===========
+			you can react on a state change:
+				sm = SM()
+				def trans(oldState,newState):
+					print(oldState,"->",newState)
+				sm.transition(trans)		
+
+		Share data
+		==========
+			every state can acces the sm object through `this`:
+				this.mydata = 123
+			mydata is visible from every state
 	"""
 	def go(stateName,*args, **kwargs):
 		""" 
 			Use SM.go(statename) to switch between states
-			You have to call the class methode go()  NOT the objects
+			You have to call the class methode go() NOT the objects
 
-			You can provide arguments with go("statename",some,arguments="foo")
+			You can provide arguments with SM.go("statename",some,arguments="foo")
 
 			go() is breaking out of the current executed state by throwing an NextState
 			exception, this gets catched by the state machine, then it starts the next state.
+			
+			So catching ALL Exceptions will not work:
+				def stateFoo():
+					try:
+						# do something 
+						SM.go("otherState")
+					except Exception:
+						# i will break the state machine :/
 		"""
 		newStateInfo = NewStateInfo(stateName,args,kwargs)
 		raise NextState (newStateInfo)
@@ -164,8 +188,13 @@ class SM(object):
 		this.activeState = this.newStateInfo.nextState
 		
 		while True:
+			try:
+				this.transitionFunc(this.oldState,this.activeState) 
+			except Exception:
+				print("Error in transition function [%s] -> [%s]" % (this.oldState,this.activeState))
+				raise
+
 			try:			
-				this.transitionFunc(this.oldState,this.activeState) # 
 				this.states[this.activeState](*this.newStateInfo.args, **this.newStateInfo.kwargs )
 				this.log.error("State [%s] did not go to another state, so exitting" % this.activeState)
 				break				
@@ -177,7 +206,7 @@ class SM(object):
 				this.activeState = this.newStateInfo.nextState
 				continue
 			except Exception as exp:
-				# A state has trown an error withouth 
+				# A state has thrown an error withouth 
 				# catching it, if the state machine 
 				# has an default error state
 				# we switch to it
@@ -193,7 +222,7 @@ class SM(object):
 					this.newStateInfo = NewStateInfo(SM._fn ( this.errorState ),[], {}) # atm the error state is not accepting parameters
 					continue
 				else:
-					raise exp					
+					raise					
 
 					
 if __name__ == '__main__':
