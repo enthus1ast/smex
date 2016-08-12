@@ -3,6 +3,23 @@ smex
 Smex is a simple state machine.
 
 
+Arguments to states
+===================
+	one could also append args and kwargs to the state by:
+	SM.go("state",args,some="more")
+Transitions
+===========
+	you can react on a state change:
+		sm = SM()
+		def trans(oldState,newState):
+			print(oldState,"->",newState)
+		sm.transition(trans)		
+Share data
+==========
+	every state can acces the sm object through `this`:
+		this.mydata = 123
+	mydata is visible from every state
+
 
 Usage:	
 ```python
