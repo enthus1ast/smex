@@ -21,7 +21,8 @@ Share data
 	mydata is visible from every state
 
 
-Usage:	
+Usage	
+======
 ```python
 
 from smex import SM
